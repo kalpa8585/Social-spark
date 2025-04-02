@@ -1,0 +1,85 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { PlusCircle, CheckCircle, Trash, Link as LinkIcon } from "lucide-react";
+
+export default function SalesLeadsApp() {
+  const [leads, setLeads] = useState([
+    { id: 1, name: "John Doe", email: "john@example.com", status: "Pending", link: "https://example.com" },
+  ]);
+  const [newLead, setNewLead] = useState({ name: "", email: "", link: "" });
+
+  const addLead = () => {
+    if (newLead.name && newLead.email && newLead.link) {
+      setLeads([...leads, { id: leads.length + 1, ...newLead, status: "Pending" }]);
+      setNewLead({ name: "", email: "", link: "" });
+    }
+  };
+
+  const updateStatus = (id, status) => {
+    setLeads(leads.map((lead) => (lead.id === id ? { ...lead, status } : lead)));
+  };
+
+  const deleteLead = (id) => {
+    setLeads(leads.filter((lead) => lead.id !== id));
+  };
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Sales Leads Tracker</h1>
+      <Dialog>
+        <DialogTrigger>
+          <Button className="mb-4 flex items-center gap-2">
+            <PlusCircle size={18} /> Add Lead
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <Input placeholder="Name" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} />
+          <Input placeholder="Email" value={newLead.email} onChange={(e) => setNewLead({ ...newLead, email: e.target.value })} />
+          <Input placeholder="Link" value={newLead.link} onChange={(e) => setNewLead({ ...newLead, link: e.target.value })} />
+          <Button onClick={addLead}>Save</Button>
+        </DialogContent>
+      </Dialog>
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Link</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leads.map((lead) => (
+                <TableRow key={lead.id}>
+                  <TableCell>{lead.name}</TableCell>
+                  <TableCell>{lead.email}</TableCell>
+                  <TableCell>
+                    <a href={lead.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 flex items-center gap-1">
+                      <LinkIcon size={16} /> Visit
+                    </a>
+                  </TableCell>
+                  <TableCell>{lead.status}</TableCell>
+                  <TableCell className="flex gap-2">
+                    <Button size="sm" onClick={() => updateStatus(lead.id, "Converted")}>
+                      <CheckCircle size={16} /> Convert
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => deleteLead(lead.id)}>
+                      <Trash size={16} /> Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
